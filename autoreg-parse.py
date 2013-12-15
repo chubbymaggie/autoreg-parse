@@ -1,5 +1,3 @@
-__author__ = 'Patrick Olsen'
-
 '''
 Author: Patrick Olsen
 Email: patrickolsen@sysforensics.org
