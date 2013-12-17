@@ -27,7 +27,6 @@ No order....
 [ ] Make it modular....(read: regripper) 
 [ ] Add argsparse so it is more formal -> -n <nt_user> -soft <software> -sys <system>
 [ ] Process multiple NTUSER.DAT files (think of the output)
-
 '''
 
 import sys
