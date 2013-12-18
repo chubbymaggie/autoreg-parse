@@ -10,6 +10,7 @@ No order....
 
 [ ] CLEAN UP THE CODE - It is poorly written
 [ ] Add some error handling. For example, only needing to pass in NTUSER if you only want to leverage only NTUSER hives
+[O] User Assist - got the items parsed, just need to verify other information with the keys as well.
 [O] Add [x]install date, [x]OS version, [x]Computer name, []Shutdown time, []SIDS
 [O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well
 [ ] Services - White list of some kind maybe?
@@ -26,6 +27,7 @@ No order....
 import time
 import hashlib
 import re
+import codecs
 from Registry import Registry
 import argparse
 
@@ -504,6 +506,22 @@ def getMD5sum(filename):
              md5.update(chunk)
     return md5.hexdigest()
 
+def getUserAssist(reg_nt):
+
+    print ("\n" + ("=" * 51) + "\nUSER ASSIST\n" + ("=" * 51))
+
+    try:
+        userassist = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\UserAssist")
+
+        for items in userassist.subkeys():
+            k = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\UserAssist\\%s" % (items.name()))
+            for ua_keys in k.subkeys():
+                for ua_values in ua_keys.values():
+                    print codecs.decode(ua_values.name(), 'rot_13')
+
+    except Registry.RegistryKeyNotFoundException as e:
+        pass
+
 def main():
 
     getSysInfo(reg_soft, reg_sys)
@@ -517,6 +535,7 @@ def main():
     getKnownDLLs(reg_sys)
     getMounted(reg_sys, reg_nt)
     getSysinternals(reg_nt)
+    getUserAssist(reg_nt)
     #getMD5sum(filename)
 
 if __name__ == "__main__":
