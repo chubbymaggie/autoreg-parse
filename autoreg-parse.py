@@ -22,6 +22,7 @@ No order....
 [ ] VT support with hashes from hashing function
 [X] Add support for session manager info
 [X] Added AppInit_DLLs
+[X] Added Map Network Drive MRU (XP Systems)
 [X] Known DLLs
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
 [ ] Make it modular....(read: regripper)
@@ -462,35 +463,46 @@ def getBHOs(reg_soft):
 
 def getMounted(reg_sys, reg_nt):
 
-    print ("\n" + ("=" * 51) + "\nMOUNTPOINTS2 -> POSSIBLE LATERAL MOVEMENT\n" + ("=" * 51))
+    print ("\n" + ("=" * 65) + "\nMOUNTPOINTS2 and NETWORK MRUs (XP) -> POSSIBLE LATERAL MOVEMENT\n" + ("=" * 65))
 
     mDevices = []
     mPoints2 = []
 
-    mounteddevices = reg_sys.open("MountedDevices")
+    try:
+        mounteddevices = reg_sys.open("MountedDevices")
+        mountpoints = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MountPoints2")
+        networkmru = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Map Network Drive MRU")
 
-    for mount in mounteddevices.values():
-        mDevices.append(mount.name())
+        for mount in mounteddevices.values():
+            mDevices.append(mount.name())
 
-    mountpoints = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MountPoints2")
+        for mps in mountpoints.subkeys():
+            mPoints2.append(mps.name())
 
-    for mps in mountpoints.subkeys():
-        mPoints2.append(mps.name())
-        if "#" in mps.name():
-            print 'ShareName: %s\nTimestamp: %s\n' % (mps.name(), mps.timestamp())
-        else:
-            pass
-
-    '''
-    This would link back to a drive being opened by a specific user at some point in time. Maybe i'll add this later.
-
-    for x in mPoints2:
-        for y in mDevices:
-            if re.search(x, y):
-                print x, y
+            if "#" in mps.name():
+                print 'MountPoints2 Share: %s\nLast Write: %s\n' % (mps.name(), mps.timestamp())
             else:
                 pass
-    '''
+
+        for mrus in networkmru.values():
+            if mrus.name() == "MRUList":
+                pass
+            else:
+                print 'Network MRU: %s\nShare: %s\nLast Write: %s\n' % (mrus.name(), mrus.value(), networkmru.timestamp())
+
+    except Registry.RegistryKeyNotFoundException as e:
+        pass
+
+        '''
+        This would link back to a drive being opened by a specific user at some point in time. Maybe i'll add this later.
+
+        for x in mPoints2:
+            for y in mDevices:
+                if re.search(x, y):
+                    print x, y
+                else:
+                    pass
+        '''
 
 def getMD5sum(filename):
     md5 = hashlib.md5()
