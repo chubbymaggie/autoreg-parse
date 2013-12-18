@@ -1,11 +1,31 @@
-python autoreg-parse.py NTUSER.DAT SOFTWARE SYSTEM
+python autoreg-parse.py -h
+
+usage: autoreg-parse.py [-h] [-nt NTUSER] [-sys SYSTEM] [-soft SOFTWARE]
+
+Parse the Windows registry for malware-ish related artifacts.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -nt NTUSER, --ntuser NTUSER
+                        Path to the NTUSER.DAT hive you want parsed
+  -sys SYSTEM, --system SYSTEM
+                        Path to the SYSTEM hive you want parsed
+  -soft SOFTWARE, --software SOFTWARE
+                        Path to the SOFTWARE hive you want parsed
+
+
+
+
+
+
+python autoreg-parse.py -nt NTUSER.DAT -sys system -soft software 
 
 
 ===================================================
 OS INFORMATION
 ===================================================
 Computer Name: WINXPX86
-Operating System: Microsoft Windows XP 5.1 1.511.1 () (Obsolete data - do not use)
+Operating System: Microsoft Windows XP 5.1 1.511.1
 Install Date: Sat Mar 09 07:50:23 2013 (UTC)
 
 ===================================================
@@ -23,10 +43,18 @@ Key: LogMeIn GUI
 Value: "C:\Program Files\LogMeIn\x86\LogMeInSystray.exe"
 RegPath: Microsoft\Windows\CurrentVersion\Run
 
+
+===================================================
+AppInit_DLLs
+===================================================
 Key: AppInit_DLLs
 Value: 
 RegPath: Microsoft\Windows NT\CurrentVersion\Windows\AppInit_DLLs
 
+
+===================================================
+WINDOWS LOGON
+===================================================
 Key: Winlogon
 Value: Explorer.exe
 RegPath: Microsoft\Windows NT\CurrentVersion\Winlogon
@@ -341,6 +369,10 @@ Value: wldap32.dll
 
 
 ===================================================
+MOUNTPOINTS2 -> POSSIBLE LATERAL MOVEMENT
+===================================================
+
+===================================================
 SYSINTERNAL TOOLS THAT HAVE BEEN RUN 
 ===================================================
 Key: AutoRuns
@@ -372,4 +404,3 @@ Last Write: 2013-04-18 07:15:58.311071
 
 Key: TCPView
 Last Write: 2013-10-15 09:27:22.970438
-
