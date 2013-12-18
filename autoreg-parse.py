@@ -11,22 +11,15 @@ No order....
 [ ] CLEAN UP THE CODE - It is poorly written
 [ ] Add some error handling. For example, only needing to pass in NTUSER if you only want to leverage only NTUSER hives
 [O] Add [x]install date, [x]OS version, [x]Computer name, []Shutdown time, []SIDS
-[O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well.
+[O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well
 [ ] Services - White list of some kind maybe?
 [ ] WinRar - reg query HKCU\\Software\\WinRAR\\DialogEditHistory\\ArcName
 [ ] 7zip - reg query "HKCU\\Software\\7-Zip"
-[X] Sysinternals - reg query "HKCU\\Software\\Sysinternals
 [ ] TypedURLs? - HKCU\\Software\\Microsoft\\Internet Explorer\\TypedURLs
-[X] Mountpoints2 - Possible lateral movement after shares are mapped - NTUSER.DAT
 [O] Do something with the hashing function later if I run it against a mounted full disk image later
 [ ] VT support with hashes from hashing function
-[X] Add support for session manager info
-[X] Added AppInit_DLLs
-[X] Added Map Network Drive MRU (XP Systems)
-[X] Known DLLs
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
 [ ] Make it modular....(read: regripper)
-[X] Add argsparse so it is more formal -> -n <nt_user> -soft <software> -sys <system>
 [ ] Process multiple NTUSER.DAT files (think of the output)
 '''
 
