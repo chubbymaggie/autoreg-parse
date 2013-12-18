@@ -8,46 +8,59 @@ X = Done, O = Partially done and implemented, [ ] Not started
 
 No order....
 
+[ ] CLEAN UP THE CODE - It is poorly written
+[ ] Add some error handling. For example, only needing to pass in NTUSER if you only want to leverage only NTUSER hives
 [O] Add [x]install date, [x]OS version, [x]Computer name, []Shutdown time, []SIDS
-[ ] Add Terminal services information: NTUSER: Software\Microsoft\Terminal Server Client\Default
 [O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well.
 [ ] Services - White list of some kind maybe?
 [ ] WinRar - reg query HKCU\\Software\\WinRAR\\DialogEditHistory\\ArcName
 [ ] 7zip - reg query "HKCU\\Software\\7-Zip"
 [X] Sysinternals - reg query "HKCU\\Software\\Sysinternals
 [ ] TypedURLs? - HKCU\\Software\\Microsoft\\Internet Explorer\\TypedURLs
-[ ] Mount points - Possible lateral movement
+[X] Mountpoints2 - Possible lateral movement after shares are mapped - NTUSER.DAT
 [O] Do something with the hashing function later if I run it against a mounted full disk image later
 [ ] VT support with hashes from hashing function
 [X] Add support for session manager info
 [X] Added AppInit_DLLs
 [X] Known DLLs
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
-[ ] CLEAN UP THE CODE - IT IS VERY DIRTY
-[ ] Make it modular....(read: regripper) 
-[ ] Add argsparse so it is more formal -> -n <nt_user> -soft <software> -sys <system>
+[ ] Make it modular....(read: regripper)
+[X] Add argsparse so it is more formal -> -n <nt_user> -soft <software> -sys <system>
 [ ] Process multiple NTUSER.DAT files (think of the output)
 '''
 
-import sys
-import os
 import time
-import platform
 import hashlib
 import re
 from Registry import Registry
+import argparse
 
-reg_nt = Registry.Registry(sys.argv[1])
-reg_soft = Registry.Registry(sys.argv[2])
-reg_sys = Registry.Registry(sys.argv[3])
+parser = argparse.ArgumentParser(description='Parse the Windows registry for malware-ish related artifacts.')
+parser.add_argument('-nt', '--ntuser', help='Path to the NTUSER.DAT hive you want parsed')
+parser.add_argument('-sys', '--system', help='Path to the SYSTEM hive you want parsed')
+parser.add_argument('-soft', '--software', help='Path to the SOFTWARE hive you want parsed')
+args = parser.parse_args()
 
-def usage():
-    return "  USAGE:\n\t%s <Windows Registry file> <Registry key path>" % sys.argv[0]
+if args.ntuser:
+    reg_nt = Registry.Registry(args.ntuser)
+else:
+    pass
 
-def getSysInfo():
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+if args.software:
+    reg_soft = Registry.Registry(args.software)
+else:
+    pass
+
+if args.system:
+    reg_sys = Registry.Registry(args.system)
+else:
+    pass
+
+print reg_nt
+print reg_soft
+print reg_sys
+
+def getSysInfo(reg_soft, reg_sys):
 
     os_dict = {}
 
@@ -91,26 +104,22 @@ def getSysInfo():
     print "Operating System: " + os_dict['ProductName'], os_dict['CurrentVersion'], os_dict['CurrentBuild']
     print "Install Date: " + os_dict['InstallDate']
 
-def getServices():
-
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+def getServices(reg_sys):
 
     select = reg_sys.open("Select")
     current = select.value("Current").value()
     services = reg_sys.open("ControlSet00%d\\Services" % (current))
 
-    service_list        = []
+    service_list = []
 
     for service in services.subkeys():
         service_list.append(service.name().lower())
 
-    bootstart_list      = []
-    kernelDriver_list   = []
-    autostart_list      = []
-    loadonDemand_list   = []
-    disabled_list       = []
+    bootstart_list = []
+    kernelDriver_list = []
+    autostart_list = []
+    loadonDemand_list = []
+    disabled_list = []
 
 
     '''
@@ -223,22 +232,10 @@ def getServices():
         except:
             pass
 
-def getRunKeys():
-
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+def getRunKeys(reg_soft, reg_nt, reg_sys):
 
     print ("\n" + ("=" * 51) + "\nTRADITIONAL \"RUN\" KEYS\n" + ("=" * 51))
 
-    #Winlogon Keys
-    winlogon_list = ["Microsoft\\Windows NT\\CurrentVersion",
-                     "Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify"]
-
-    appinit_dlls =  ["Microsoft\\Windows NT\\CurrentVersion\\Windows",
-                     "Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows"]
-
-    #HKLM Keys
     hklm_run_list = ["Microsoft\\Windows\\CurrentVersion\\Run",
                      "Microsoft\\Windows\\CurrentVersion\\RunOnce",
                      "Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
@@ -253,7 +250,6 @@ def getRunKeys():
                      "Classes\\Protocols\\Handler",
                      "Classes\\*\\ShellEx\\ContextMenuHandlers"]
 
-    #NTUSER.DAT (HKCU) Keys
     ntuser_run_list = ["Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                        "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
                        "Software\\Microsoft\\Windows\\CurrentVersion\\RunServicesOnce",
@@ -285,11 +281,19 @@ def getRunKeys():
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
+
+def getAppInitDLLs(reg_soft):
+
+    print ("\n" + ("=" * 51) + "\nAppInit_DLLs\n" + ("=" * 51))
+
+    appinit_dlls = ["Microsoft\\Windows NT\\CurrentVersion\\Windows",
+                    "Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows"]
+
     try:
         for k in appinit_dlls:
             key = reg_soft.open(k)
             for v in key.values():
-                matchObj = re.match(r"AppInit_DLLs", v.name(), re.M|re.I)
+                matchObj = re.match(r"AppInit_DLLs", v.name())
                 path = k + "\\" + v.name()
                 if matchObj:
                     if v.value_type() == Registry.RegSZ or v.value_type() == Registry.RegExpandSZ or v.value_type() == Registry.RegMultiSZ:
@@ -299,6 +303,14 @@ def getRunKeys():
 
     except Registry.RegistryKeyNotFoundException as e:
         pass
+
+
+def getWinlogon(reg_soft):
+
+    print ("\n" + ("=" * 51) + "\nWINDOWS LOGON\n" + ("=" * 51))
+
+    winlogon_list = ["Microsoft\\Windows NT\\CurrentVersion",
+                     "Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify"]
 
     try:
         for k in winlogon_list:
@@ -317,7 +329,8 @@ def getRunKeys():
                         else:
                             pass
                         if winlogon_values.name() == "Taskman":
-                            print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name() == "Taskman", winlogon_path)
+                            #print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name() == "Taskman", winlogon_path)
+                            print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name(), winlogon_path)
                         else:
                             pass
                 else:
@@ -325,6 +338,8 @@ def getRunKeys():
 
     except Registry.RegistryKeyNotFoundException as e:
         pass
+
+def getSessionManager(reg_sys):
 
     print ("\n" + ("=" * 51) + "\nSESSION MANAGER INFORMATION\n" + ("=" * 51))
 
@@ -351,11 +366,7 @@ def getRunKeys():
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
-def knownDLLs():
-
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+def getKnownDLLs(reg_sys):
 
     selectCurrent = reg_sys.open("Select")
     selectCurrentNumber = selectCurrent.value("Current").value()
@@ -378,11 +389,7 @@ def knownDLLs():
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
-def getActiveSetup():
-
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+def getActiveSetup(reg_soft):
 
     print ("\n" + ("=" * 51) + "\nACTIVE SETUP - INSTALLED COMPONENTS \n" + ("=" * 51))
 
@@ -410,11 +417,7 @@ def getActiveSetup():
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
-def getSysinternals():
-
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+def getSysinternals(reg_nt):
 
     print ("\n" + ("=" * 51) + "\nSYSINTERNAL TOOLS THAT HAVE BEEN RUN \n" + ("=" * 51))
 
@@ -438,10 +441,7 @@ def getSysinternals():
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
-def getBHOs():
-    if len(sys.argv) != 4:
-        print(usage())
-        sys.exit(-3)
+def getBHOs(reg_soft):
 
     bho_keys = ["Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects",
                 "Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects"]
@@ -465,7 +465,39 @@ def getBHOs():
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
-def md5sum(filename):
+def getMounted(reg_sys, reg_nt):
+
+    print ("\n" + ("=" * 51) + "\nMOUNTPOINTS2 -> POSSIBLE LATERAL MOVEMENT\n" + ("=" * 51))
+
+    mDevices = []
+    mPoints2 = []
+
+    mounteddevices = reg_sys.open("MountedDevices")
+
+    for mount in mounteddevices.values():
+        mDevices.append(mount.name())
+
+    mountpoints = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MountPoints2")
+
+    for mps in mountpoints.subkeys():
+        mPoints2.append(mps.name())
+        if "#" in mps.name():
+            print 'ShareName: %s\nTimestamp: %s\n' % (mps.name(), mps.timestamp())
+        else:
+            pass
+
+    '''
+    This would link back to a drive being opened by a specific user at some point in time. Maybe i'll add this later.
+
+    for x in mPoints2:
+        for y in mDevices:
+            if re.search(x, y):
+                print x, y
+            else:
+                pass
+    '''
+
+def getMD5sum(filename):
     md5 = hashlib.md5()
     with open(filename,'rb') as f:
         for chunk in iter(lambda: f.read(128*md5.block_size), b''):
@@ -474,13 +506,18 @@ def md5sum(filename):
 
 def main():
 
-    getSysInfo()
-    getRunKeys()
-    getBHOs()
-    getActiveSetup()
-    getServices()
-    knownDLLs()
-    getSysinternals()
+    getSysInfo(reg_soft, reg_sys)
+    getRunKeys(reg_soft, reg_nt, reg_sys)
+    getAppInitDLLs(reg_soft)
+    getWinlogon(reg_soft)
+    getSessionManager(reg_sys)
+    getBHOs(reg_soft)
+    getActiveSetup(reg_soft)
+    getServices(reg_sys)
+    getKnownDLLs(reg_sys)
+    getMounted(reg_sys, reg_nt)
+    getSysinternals(reg_nt)
+    #getMD5sum(filename)
 
 if __name__ == "__main__":
     main()
