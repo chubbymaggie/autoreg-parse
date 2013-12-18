@@ -56,10 +56,6 @@ if args.system:
 else:
     pass
 
-print reg_nt
-print reg_soft
-print reg_sys
-
 def getSysInfo(reg_soft, reg_sys):
 
     os_dict = {}
@@ -120,7 +116,6 @@ def getServices(reg_sys):
     autostart_list = []
     loadonDemand_list = []
     disabled_list = []
-
 
     '''
     Reference: http://support.microsoft.com/kb/103000
