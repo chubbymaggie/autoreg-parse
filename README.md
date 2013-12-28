@@ -1,7 +1,9 @@
 Auto Registry Parser 
 ====================  
 
-The idea of this started out as one to duplicate autoruns to the extent possible with only offline registry analysis. Then I started adding things at random. I couldn't think of a better name. So this focuses on quickly identifying malware persistence locations, a few locations/items used by actors when moving laterally throughout a network, and then a few random/informatioal ones.
+The idea of this started out as one to duplicate Microsoft's autoruns tool to the extent possible with only offline registry hives. Then I started adding things at random. I couldn't think of a better name. 
+
+It focuses on quickly identifying malware persistence locations, a few locations/items used by actors when moving laterally throughout a network, and then a few random/informational ones.
 
 INSTALL
 ========
