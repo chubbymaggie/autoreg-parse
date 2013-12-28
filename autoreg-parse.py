@@ -16,7 +16,6 @@ No order....
 [ ] Services - White list of some kind maybe?
 [ ] WinRar - reg query HKCU\\Software\\WinRAR\\DialogEditHistory\\ArcName
 [ ] 7zip - reg query "HKCU\\Software\\7-Zip"
-[ ] TypedURLs? - HKCU\\Software\\Microsoft\\Internet Explorer\\TypedURLs
 [O] Do something with the hashing function later if I run it against a mounted full disk image later
 [ ] VT support with hashes from hashing function
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
@@ -522,6 +521,20 @@ def getUserAssist(reg_nt):
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
+def getTypedURLs(reg_nt):
+
+    print ("\n" + ("=" * 51) + "\nTYPED URLS\n" + ("=" * 51))
+
+    TypedURL = []
+
+    try:
+        typedURLs = reg_nt.open("Software\\Microsoft\\Internet Explorer\\TypedURLs")
+        for url in typedURLs.values():
+            print url.value()
+
+    except Registry.RegistryKeyNotFoundException as e:
+        pass
+
 def main():
 
     getSysInfo(reg_soft, reg_sys)
@@ -534,6 +547,7 @@ def main():
     getServices(reg_sys)
     getKnownDLLs(reg_sys)
     getMounted(reg_sys, reg_nt)
+    getTypedURLs(reg_nt)
     getSysinternals(reg_nt)
     getUserAssist(reg_nt)
     #getMD5sum(filename)
