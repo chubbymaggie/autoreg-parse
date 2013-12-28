@@ -3,13 +3,6 @@ Auto Registry Parser
 
 The idea of this started out as one to duplicate autoruns to the extent possible with only offline registry analysis. Then I started adding things at random. I couldn't think of a better name. So this focuses on quickly identifying malware persistence locations, a few locations/items used by actors when moving laterally throughout a network, and then a few random/informatioal ones.
 
-Big Thanks to:
-==============
-
-@williballenthin - http://www.williballenthin.com for writing python-registry, which is what I am using. It's great.
-
-@hiddenillusion - This example got me started on the idea. https://github.com/williballenthin/python-registry/blob/master/samples/forensicating.py
-
 INSTALL
 ========
 
@@ -68,3 +61,10 @@ No order....
                         [ ] Decide which keys I want to have last write time for (besides Sysinternals)
                         [O] Make it modular....(read: regripper) -> I added simple elif statements in the main() so -p can be used, but it's not the final way I want.
                         [ ] Process multiple NTUSER.DAT files (think of the output)
+
+Big Thanks to:
+==============
+
+@williballenthin - http://www.williballenthin.com for writing python-registry, which is what I am using. It's great.
+
+@hiddenillusion - This example got me started on the idea. https://github.com/williballenthin/python-registry/blob/master/samples/forensicating.py
