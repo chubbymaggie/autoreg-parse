@@ -13,7 +13,10 @@ Big Thanks to:
 HELP
 =====
 
+python autoreg-parse.py -h
+
 usage: autoreg-parse.py [-h] [-nt NTUSER] [-sys SYSTEM] [-soft SOFTWARE]
+                        [-p PLUGIN [PLUGIN ...]]
 
 Parse the Windows registry for malware-ish related artifacts.
 
@@ -25,6 +28,9 @@ optional arguments:
                         Path to the SYSTEM hive you want parsed
   -soft SOFTWARE, --software SOFTWARE
                         Path to the SOFTWARE hive you want parsed
+  -p PLUGIN [PLUGIN ...], --plugin PLUGIN [PLUGIN ...]
+                        [lateralmovement] = MountPoints2 and Network MRUs,
+                        [urls] = TypedURLs, [mounts] = MountPoints
                         
 EXAMPLE OUTPUT
 ===============
@@ -61,6 +67,6 @@ No order....
 
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
 
-[ ] Make it modular....(read: regripper)
+[O] Make it modular....(read: regripper) -> I added simple elif statements in the main() so -p can be used, but it's not the final way I want.
 
 [ ] Process multiple NTUSER.DAT files (think of the output)
