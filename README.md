@@ -10,8 +10,19 @@ Big Thanks to:
 
 @hiddenillusion - This example got me started on the idea. https://github.com/williballenthin/python-registry/blob/master/samples/forensicating.py
 
-HELP
-=====
+INSTALL
+========
+
+Download: https://github.com/williballenthin/python-registry
+
+python setup.py build
+
+python setup.py install
+
+That should be all you need. It will work in Windows and Linux/OSX.
+
+HOW-TO
+=======
 
 python autoreg-parse.py -h
 
