@@ -14,8 +14,9 @@ No order....
 [O] Add [x]install date, [x]OS version, [x]Computer name, []Shutdown time, []SIDS
 [O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well
 [ ] Services - White list of some kind maybe?
-[ ] WinRar - reg query HKCU\\Software\\WinRAR\\DialogEditHistory\\ArcName
-[ ] 7zip - reg query "HKCU\\Software\\7-Zip"
+[X] WinZip - Software\\Nico Mak Computing\\WinZip
+[ ] WinRar - Software\\WinRAR\\DialogEditHistory\\ArcName
+[ ] 7zip -   Software\\7-Zip
 [O] Do something with the hashing function later if I run it against a mounted full disk image later
 [ ] VT support with hashes from hashing function
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
@@ -521,6 +522,35 @@ def getUserAssist(reg_nt):
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
+def getArchives(reg_nt):
+
+    print ("\n" + ("=" * 51) + "\nARCHIVE LOCATIONS (WinZip, WinRAR, and 7zip)\n" + ("=" * 51))
+
+    #archivedFiles = []
+
+    try:
+        print ("WINZIP: Software\\Nico Mak Computing\\WinZip\\filemenu")
+        winzip = reg_nt.open("Software\\Nico Mak Computing\\WinZip")        
+        for wz_archives in winzip.subkeys():
+            if wz_archives.name() == 'filemenu':
+                print 'LastWrite Time: %s\n' % (winzip.timestamp())
+                for wz_v in wz_archives.values():
+                    print '%s -> %s' % (wz_v.name(), wz_v.value())
+            else:
+                pass            
+        
+        print ("\n""WINZIP: Software\\Nico Mak Computing\\WinZip\\WIZDIR")      
+        for wz_archives in winzip.subkeys():
+            if wz_archives.name() == 'WIZDIR':
+                print 'LastWrite Time: %s\n' % (winzip.timestamp())
+                for wz_v in wz_archives.values():
+                    print '%s -> %s' % (wz_v.name(), wz_v.value())        
+            else:
+                pass
+    
+    except Registry.RegistryKeyNotFoundException as e:
+        pass
+
 def getTypedURLs(reg_nt):
 
     print ("\n" + ("=" * 51) + "\nTYPED URLS\n" + ("=" * 51))
@@ -545,11 +575,12 @@ def main():
     getBHOs(reg_soft)
     getActiveSetup(reg_soft)
     getServices(reg_sys)
-    getKnownDLLs(reg_sys)
     getMounted(reg_sys, reg_nt)
+    getArchives(reg_nt)
     getTypedURLs(reg_nt)
     getSysinternals(reg_nt)
     getUserAssist(reg_nt)
+    getKnownDLLs(reg_sys)
     #getMD5sum(filename)
 
 if __name__ == "__main__":
