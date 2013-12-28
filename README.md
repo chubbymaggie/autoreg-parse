@@ -70,3 +70,5 @@ Big Thanks to:
 @williballenthin - http://www.williballenthin.com for writing python-registry, which is what I am using. It's great.
 
 @hiddenillusion - This example got me started on the idea. https://github.com/williballenthin/python-registry/blob/master/samples/forensicating.py
+
+Wingware for providing a great Python IDE and supporting the Open Source community. http://www.wingware.com/
