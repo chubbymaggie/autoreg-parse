@@ -39,7 +39,7 @@ python autoreg-parse.py -h
 EXAMPLE OUTPUT
 ===============
 
-See Example.txt - https://github.com/sysforensics/autoreg-parse/blob/master/EXAMPLE.TXT
+See Example.txt - https://github.com/sysforensics/autoreg-parse/blob/master/Example_Output.txt
 
 TODO
 =====
