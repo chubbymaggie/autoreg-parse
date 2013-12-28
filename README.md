@@ -38,16 +38,29 @@ X = Done, O = Partially done and implemented, [ ] Not started
 No order....
 
 [ ] CLEAN UP THE CODE - It is poorly written
+
 [ ] Add some error handling. For example, only needing to pass in NTUSER if you only want to leverage only NTUSER hives
+
 [O] User Assist - got the items parsed, just need to verify other information with the keys as well.
+
 [O] Add [x]install date, [x]OS version, [x]Computer name, []Shutdown time, []SIDS
+
 [O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well
+
 [ ] Services - White list of some kind maybe?
+
 [X] WinZip - Software\\Nico Mak Computing\\WinZip
+
 [ ] WinRar - Software\\WinRAR\\DialogEditHistory\\ArcName
+
 [ ] 7zip -   Software\\7-Zip
+
 [O] Do something with the hashing function later if I run it against a mounted full disk image later
+
 [ ] VT support with hashes from hashing function
+
 [ ] Decide which keys I want to have last write time for (besides Sysinternals)
+
 [ ] Make it modular....(read: regripper)
+
 [ ] Process multiple NTUSER.DAT files (think of the output)
