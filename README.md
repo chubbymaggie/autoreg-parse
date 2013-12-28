@@ -16,20 +16,31 @@ HELP
 python autoreg-parse.py -h
 
 usage: autoreg-parse.py [-h] [-nt NTUSER] [-sys SYSTEM] [-soft SOFTWARE]
+
                         [-p PLUGIN [PLUGIN ...]]
 
 Parse the Windows registry for malware-ish related artifacts.
 
 optional arguments:
+
   -h, --help            show this help message and exit
+  
   -nt NTUSER, --ntuser NTUSER
+  
                         Path to the NTUSER.DAT hive you want parsed
+                        
   -sys SYSTEM, --system SYSTEM
+  
                         Path to the SYSTEM hive you want parsed
+                        
   -soft SOFTWARE, --software SOFTWARE
+  
                         Path to the SOFTWARE hive you want parsed
+                        
   -p PLUGIN [PLUGIN ...], --plugin PLUGIN [PLUGIN ...]
+  
                         [lateralmovement] = MountPoints2 and Network MRUs,
+                        
                         [urls] = TypedURLs, [mounts] = MountPoints
                         
 EXAMPLE OUTPUT
