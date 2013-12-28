@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description='Parse the Windows registry for mal
 parser.add_argument('-nt', '--ntuser', help='Path to the NTUSER.DAT hive you want parsed')
 parser.add_argument('-sys', '--system', help='Path to the SYSTEM hive you want parsed')
 parser.add_argument('-soft', '--software', help='Path to the SOFTWARE hive you want parsed')
+parser.add_argument('-p', '--plugin', nargs='+', help='[lateralmovement] = MountPoints2 and Network MRUs, [urls] = TypedURLs, [mounts] = MountPoints')
 args = parser.parse_args()
 
 if args.ntuser:
@@ -32,7 +33,9 @@ if args.system:
 else:
     pass
 
+
 def getSysInfo(reg_soft, reg_sys):
+    '''This produces System Information to include product name, edition, current build and install date.'''
 
     os_dict = {}
 
@@ -77,7 +80,7 @@ def getSysInfo(reg_soft, reg_sys):
     print "Install Date: " + os_dict['InstallDate']
 
 def getServices(reg_sys):
-
+    
     select = reg_sys.open("Select")
     current = select.value("Current").value()
     services = reg_sys.open("ControlSet00%d\\Services" % (current))
@@ -92,14 +95,13 @@ def getServices(reg_sys):
     autostart_list = []
     loadonDemand_list = []
     disabled_list = []
-
     '''
     Reference: http://support.microsoft.com/kb/103000
-        Boot Loader scans the Registry for drivers with a Start value of 0 (which indicates that these drivers
-        should be loaded but not initialized before the Kernel) and a Type value of 0x1 (which indicates a Kernel
-        device driver such as a hard disk or other low-level hardware device driver).
+    Boot Loader scans the Registry for drivers with a Start value of 0 (which indicates that these drivers
+    should be loaded but not initialized before the Kernel) and a Type value of 0x1 (which indicates a Kernel
+    device driver such as a hard disk or other low-level hardware device driver).
     Reference: Plaso Code Base
-    '''
+    '''  
     for service_name in service_list:
         k = reg_sys.open("ControlSet00%d\\Services\\%s" % (current, service_name))
         for v in k.values():
@@ -252,7 +254,6 @@ def getRunKeys(reg_soft, reg_nt, reg_sys):
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
-
 def getAppInitDLLs(reg_soft):
 
     print ("\n" + ("=" * 51) + "\nAppInit_DLLs\n" + ("=" * 51))
@@ -274,7 +275,6 @@ def getAppInitDLLs(reg_soft):
 
     except Registry.RegistryKeyNotFoundException as e:
         pass
-
 
 def getWinlogon(reg_soft):
 
@@ -300,8 +300,8 @@ def getWinlogon(reg_soft):
                         else:
                             pass
                         if winlogon_values.name() == "Taskman":
-                            #print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name() == "Taskman", winlogon_path)
-                            print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name(), winlogon_path)
+                            print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name() == "Taskman", winlogon_path)
+                            #print 'Key: %s\nValue: %s\nRegPath: %s\n' % (winlogon_values.name(), winlogon_path)
                         else:
                             pass
                 else:
@@ -408,7 +408,6 @@ def getSysinternals(reg_nt):
                             pass
                     else:
                         pass
-
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
@@ -478,30 +477,6 @@ def getMounted(reg_sys, reg_nt):
                 else:
                     pass
         '''
-
-def getMD5sum(filename):
-    md5 = hashlib.md5()
-    with open(filename,'rb') as f:
-        for chunk in iter(lambda: f.read(128*md5.block_size), b''):
-             md5.update(chunk)
-    return md5.hexdigest()
-
-def getUserAssist(reg_nt):
-
-    print ("\n" + ("=" * 51) + "\nUSER ASSIST\n" + ("=" * 51))
-
-    try:
-        userassist = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\UserAssist")
-
-        for items in userassist.subkeys():
-            k = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\UserAssist\\%s" % (items.name()))
-            for ua_keys in k.subkeys():
-                for ua_values in ua_keys.values():
-                    print codecs.decode(ua_values.name(), 'rot_13')
-
-    except Registry.RegistryKeyNotFoundException as e:
-        pass
-
 def getArchives(reg_nt):
 
     print ("\n" + ("=" * 51) + "\nARCHIVE LOCATIONS (WinZip, WinRAR, and 7zip)\n" + ("=" * 51))
@@ -529,8 +504,7 @@ def getArchives(reg_nt):
                 pass
     
     except Registry.RegistryKeyNotFoundException as e:
-        pass
-
+        pass  
 def getTypedURLs(reg_nt):
 
     print ("\n" + ("=" * 51) + "\nTYPED URLS\n" + ("=" * 51))
@@ -545,23 +519,65 @@ def getTypedURLs(reg_nt):
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
+def getMD5sum(filename):
+    md5 = hashlib.md5()
+    with open(filename,'rb') as f:
+        for chunk in iter(lambda: f.read(128*md5.block_size), b''):
+             md5.update(chunk)
+    return md5.hexdigest()
+
+def getUserAssist(reg_nt):
+
+    print ("\n" + ("=" * 51) + "\nUSER ASSIST\n" + ("=" * 51))
+
+    try:
+        userassist = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\UserAssist")
+
+        for items in userassist.subkeys():
+            k = reg_nt.open("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\UserAssist\\%s" % (items.name()))
+            for ua_keys in k.subkeys():
+                for ua_values in ua_keys.values():
+                    print codecs.decode(ua_values.name(), 'rot_13')
+
+    except Registry.RegistryKeyNotFoundException as e:
+        pass
+
+
 def main():
-
-    getSysInfo(reg_soft, reg_sys)
-    getRunKeys(reg_soft, reg_nt, reg_sys)
-    getAppInitDLLs(reg_soft)
-    getWinlogon(reg_soft)
-    getSessionManager(reg_sys)
-    getBHOs(reg_soft)
-    getActiveSetup(reg_soft)
-    getServices(reg_sys)
-    getMounted(reg_sys, reg_nt)
-    getArchives(reg_nt)
-    getTypedURLs(reg_nt)
-    getSysinternals(reg_nt)
-    getUserAssist(reg_nt)
-    getKnownDLLs(reg_sys)
-    #getMD5sum(filename)
-
+    try:
+        for plug in args.plugin:
+            if plug == "sysinfo": getSysInfo(reg_soft, reg_sys)
+            elif plug == "runkeys": getRunKeys(reg_soft, reg_nt, reg_sys)
+            elif plug == "appinit": getAppInitDLLs(reg_soft)
+            elif plug == "winlogon": getWinlogon(reg_soft)
+            elif plug == "sessionmgr": getSessionManager(reg_sys)
+            elif plug == "bhos": getBHOs(reg_soft)
+            elif plug == "activeset": getActiveSetup(reg_soft)
+            elif plug == "services": getServices(reg_sys)
+            elif plug == "mounts": getMounted(reg_sys, reg_nt)
+            elif plug == "archives": getArchives(reg_nt)
+            elif plug == "urls": getTypedURLs(reg_nt)
+            elif plug == "sysinternals": getSysinternals(reg_nt)
+            elif plug == "userassist": getUserAssist(reg_nt)
+            elif plug == "knowndlls": getKnownDLLs(reg_sys)
+            elif plug == "lateralmovement": getSysinternals(reg_nt), getMounted(reg_sys, reg_nt)
+            elif plug == "all": getSysInfo(reg_soft, reg_sys), \
+                                getRunKeys(reg_soft, reg_nt, reg_sys), \
+                                getAppInitDLLs(reg_soft), \
+                                getWinlogon(reg_soft), \
+                                getSessionManager(reg_sys), \
+                                getBHOs(reg_soft), \
+                                getActiveSetup(reg_soft), \
+                                getServices(reg_sys), \
+                                getMounted(reg_sys, reg_nt), \
+                                getArchives(reg_nt), \
+                                getTypedURLs(reg_nt), \
+                                getSysinternals(reg_nt), \
+                                getUserAssist(reg_nt), \
+                                getKnownDLLs(reg_sys)
+        
+    except TypeError as e:
+        print "You need to specify a plugin. Run autoreg-parse.py -h for some examples. Review def(main) for the complete list."
+        
 if __name__ == "__main__":
     main()
