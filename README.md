@@ -49,20 +49,70 @@ X = Done, O = Partially done and implemented, [ ] Not started
 
 No order....
 
-                        [ ] CLEAN UP THE CODE - It is poorly written
-                        [ ] Add some error handling. For example, only needing to pass in NTUSER if you only want to leverage only NTUSER hives
-                        [O] User Assist - got the items parsed, just need to verify other information with the keys as well.
-                        [O] Add [x]install date, [x]OS version, [x]Computer name, []Shutdown time, []SIDS
-                        [O] Run Keys - Go back and check and verify they are working individually. Verify wow64 as well
-                        [ ] Services - White list of some kind maybe?
-                        [X] WinZip - Software\\Nico Mak Computing\\WinZip
-                        [ ] WinRar - Software\\WinRAR\\DialogEditHistory\\ArcName
-                        [ ] 7zip -   Software\\7-Zip
-                        [O] Do something with the hashing function later if I run it against a mounted full disk image later
-                        [ ] VT support with hashes from hashing function
-                        [ ] Decide which keys I want to have last write time for (besides Sysinternals)
-                        [O] Make it modular....(read: regripper) -> I added simple elif statements in the main() so -p can be used, but it's not the final way I want.
-                        [ ] Process multiple NTUSER.DAT files (think of the output)
+[O] CLEAN UP THE CODE 
+
+- [x] 12/29/2013 - Added getControlSet functions to reuse and reduce duplication. 
+- [x] 12/29/2013 - Used a dict{} within services vs. a bunch of lists to reduce code.
+
+[ ] Error handling
+
+- [ ] Add some better error handling.
+
+[O] User Assist
+
+- [x] Parser entries
+- [ ] Verify I am not missing anything.
+
+[O] System and User Information
+
+- [x] Install date
+- [x] OS version
+- [x] Computer name
+- [ ] Last logged on user
+- [ ] Shutdown time
+- [ ] SIDS and User Profile Information
+
+[ ] Run Keys
+
+- [ ] Go back and check and verify i'm not missing anything. 
+- [ ] Verify wow6432 entries.
+
+[O] Services
+
+- [x] 12/29/2013 - Added White list/Baseline feature
+- [ ] Make it so services.txt is optional so it will process it without. Also, make it so you can specify the location of services.txt.
+- [ ] Services - Add image path checking vs. just service name checking for the whitelist/baseline.
+
+[O] Archive Locations
+
+- [X] WinZip - Software\\Nico Mak Computing\\WinZip
+- [ ] WinRar - Software\\WinRAR\\DialogEditHistory\\ArcName
+- [ ] 7zip -   Software\\7-Zip
+
+[ ] Hashing Function
+
+- [X] Write hashing function
+- [ ] Allow the code to run against a disk image and hash the image paths of services, etc.
+- [ ] VT support with returned  hashes from hashing function
+
+[ ] LastWrite Times
+
+- [X] SysInternals
+- [X] Mount Points
+- [X] Archive Locations
+- [ ] Anymore???
+
+[ ] Modular
+
+- [O] I have a basic "plugin" feature, but not what I want for the end result.
+
+[ ] Program Input/Output
+
+- [ ] Input - Process multiple NTUSER.DAT files
+- [ ] Input - Allow for services.txt to be inputed on the command line (right now it's hard coded)
+- [O] Input - Plugins (See modular section)
+- [ ] Output - CSV
+- [ ] Output - sqlite???
 
 Big Thanks to:
 ==============
