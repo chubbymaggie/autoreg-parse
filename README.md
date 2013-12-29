@@ -1,22 +1,41 @@
 Auto Registry Parser 
-====================  
+======================  
 
-The idea of this started out as one to duplicate Microsoft's autoruns tool to the extent possible with only offline registry hives. Then I started adding things at random. I couldn't think of a better name. 
+The idea of this started out as one to duplicate Microsoft's autoruns tool to the extent possible with only offline registry hives. Then I started adding extra non-autoruns specific keys. I couldn't think of a better name after that so I just left it the same name. Yeah, yeah, I know...branding, but I figure if it's free and I give it away that doesn't really matter. You can name it what you want once it's downloaded to your desktop.
 
-It focuses on quickly identifying malware persistence locations, a few locations/items used by actors when moving laterally throughout a network, and then a few random/informational ones.
+Purpose/Reason
+===============
 
-INSTALL
-========
+Why not use the tools that already exist?
 
-Download: https://github.com/williballenthin/python-registry
+- Perl is old school. All the new/cools guys/gals are using Python.
+- I wanted to learn to code in Python. What better way than to write a tool in Python?
+- I didn't like the output of some of the other tools. I felt they are too "loud", GUI based, or they didn't work properly. I got pissed one day when a tool kept failing and decided to just write my own.
+- It focuses on quickly identifying common malware persistence locations or malware/actor related locations. It's not billed out as a "traditional forensics" analysis tool. I had malware in mind when I wrote it. On the flip side, you can easily write a function and I will include it. If not, I will get around to it at some point.
 
-python setup.py build
+Example Output
+=================
 
-python setup.py install
+See Example.txt - https://github.com/sysforensics/autoreg-parse/blob/master/Example_Output.txt
 
-That should be all you need. It will work in Windows and Linux/OSX.
+How to Install
+===============
 
-HOW-TO
+(Going off memory here)
+
+Python
+
+- Python 2.7
+
+Python Registry
+
+- Download: https://github.com/williballenthin/python-registry
+- python setup.py build
+- python setup.py install
+
+That should be all you need. It will work in Windows and Linux/OSX. Let me know if you have issues.
+
+How-to
 =======
 
 python autoreg-parse.py -h
@@ -37,17 +56,16 @@ python autoreg-parse.py -h
                                                 [lateralmovement] = MountPoints2 and Network MRUs,
                                                 [urls] = TypedURLs
                                                 [mounts] = MountPoints
-                        
-EXAMPLE OUTPUT
-===============
 
-See Example.txt - https://github.com/sysforensics/autoreg-parse/blob/master/Example_Output.txt
+Todo
+=======
+Key
 
-TODO
-=====
-X = Done, O = Partially done and implemented, [ ] Not started
+- X = Done
+- O = Partially done and implemented
+- [ ] = Not started
 
-No order....
+In no specific order.... It's whatever I feel like doing that day, unless someone needs/wants something sooner vs. later.
 
 [O] CLEAN UP THE CODE 
 
@@ -114,7 +132,7 @@ No order....
 - [ ] Output - CSV
 - [ ] Output - sqlite???
 
-Big Thanks to:
+Thanks to:
 ==============
 
 @williballenthin - http://www.williballenthin.com for writing python-registry, which is what I am using. It's great.
