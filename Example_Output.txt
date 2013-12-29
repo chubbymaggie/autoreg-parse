@@ -1,10 +1,12 @@
 This output is from -p all. You can specify which plugins you want to run. For example, -p services will only print out the services.
 
+Note.... It's a malicious service using RTLO Unicode. It's the Google Update one.... 
+
 ===================================================
 OS INFORMATION
 ===================================================
 Computer Name: WINXPX86
-Operating System: Microsoft Windows XP 5.1 1.511.1 () (Obsolete data - do not use)
+Operating System: Microsoft Windows XP 5.1 1.511.1
 Install Date: Sat Mar 09 07:50:23 2013 (UTC)
 
 ===================================================
@@ -102,118 +104,45 @@ Value: regsvr32.exe /s /n /i:U shell32.dll
 Key: {89820200-ECBD-11cf-8B85-00AA005B4383}
 Value: %SystemRoot%\system32\ie4uinit.exe
 
-
-=======================================================
-[ALERT!] SERVICE IMAGE PATHS NOT IN SYSTEM32 (Type 2)
-=======================================================
-ServiceName: HWDeviceService.exe
-ImagePath: "c:\documents and settings\all users\application data\datacardservice\hwdeviceservice.exe" -/service
-ServiceName: LMIGuardianSvc
-ImagePath: "c:\program files\logmein\x86\lmiguardiansvc.exe"
-ServiceName: LMIInfo
-ImagePath: \??\c:\program files\logmein\x86\rainfo.sys
-ServiceName: LMIMaint
-ImagePath: "c:\program files\logmein\x86\ramaint.exe"
-ServiceName: LogMeIn
-ImagePath: "c:\program files\logmein\x86\logmein.exe"
-ServiceName: VMMEMCTL
-ImagePath: \??\c:\program files\common files\vmware\drivers\memctl\vmmemctl.sys
-ServiceName: VMTools
-ImagePath: "c:\program files\vmware\vmware tools\vmtoolsd.exe"
-ServiceName: VMware Physical Disk Helper Service
-ImagePath: "c:\program files\vmware\vmware tools\vmacthlp.exe"
-
-=======================================================
-[ALERT!] SERVICE IMAGE PATHS NOT IN SYSTEM32 (Type 0)
-=======================================================
+===================================================
+UNKNOWN/NON-BASELINED TYPE 2 SERVICES)
+===================================================
+Service Name: . e\000t\000a\000d\000p\000u\000g\000
+Image Path: "c:\program files\google\desktop\install\{0f91adea-a35c-b700-d36c-83378aa58eea}\   \   \\{0f91adea-a35c-b700-d36c-83378aa58eea}\googleupdate.exe" <
 
 ===================================================
-LIST OF ALL AUTOSTART SERVICES
+TYPE 2 SERVICES NOT IN SYSTEM32
 ===================================================
-ServiceName: AudioSrv
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: Browser
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: BthServ
-ImagePath: %systemroot%\system32\svchost.exe -k bthsvcs
-ServiceName: CryptSvc
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: DcomLaunch
-ImagePath: %systemroot%\system32\svchost -k dcomlaunch
-ServiceName: Dhcp
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: dmserver
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: Dnscache
-ImagePath: %systemroot%\system32\svchost.exe -k networkservice
-ServiceName: ERSvc
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: Eventlog
-ImagePath: %systemroot%\system32\services.exe
-ServiceName: helpsvc
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: HWDeviceService.exe
-ImagePath: "c:\documents and settings\all users\application data\datacardservice\hwdeviceservice.exe" -/service
-ServiceName: LanmanServer
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: lanmanworkstation
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: LmHosts
-ImagePath: %systemroot%\system32\svchost.exe -k localservice
-ServiceName: LMIGuardianSvc
-ImagePath: "c:\program files\logmein\x86\lmiguardiansvc.exe"
-ServiceName: LMIInfo
-ImagePath: \??\c:\program files\logmein\x86\rainfo.sys
-ServiceName: LMIMaint
-ImagePath: "c:\program files\logmein\x86\ramaint.exe"
-ServiceName: LMIRfsDriver
-ImagePath: \??\c:\windows\system32\drivers\lmirfsdriver.sys
-ServiceName: LogMeIn
-ImagePath: "c:\program files\logmein\x86\logmein.exe"
-ServiceName: NPF
-ImagePath: system32\drivers\npf.sys
-ServiceName: PlugPlay
-ImagePath: %systemroot%\system32\services.exe
-ServiceName: ProtectedStorage
-ImagePath: %systemroot%\system32\lsass.exe
-ServiceName: RemoteRegistry
-ImagePath: %systemroot%\system32\svchost.exe -k localservice
-ServiceName: RpcSs
-ImagePath: %systemroot%\system32\svchost -k rpcss
-ServiceName: SamSs
-ImagePath: %systemroot%\system32\lsass.exe
-ServiceName: Schedule
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: seclogon
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: SENS
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: ShellHWDetection
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: Spooler
-ImagePath: %systemroot%\system32\spoolsv.exe
-ServiceName: srservice
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: Themes
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: TrkWks
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: VMMEMCTL
-ImagePath: \??\c:\program files\common files\vmware\drivers\memctl\vmmemctl.sys
-ServiceName: VMTools
-ImagePath: "c:\program files\vmware\vmware tools\vmtoolsd.exe"
-ServiceName: VMware Physical Disk Helper Service
-ImagePath: "c:\program files\vmware\vmware tools\vmacthlp.exe"
-ServiceName: W32Time
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: WebClient
-ImagePath: %systemroot%\system32\svchost.exe -k localservice
-ServiceName: winmgmt
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: wuauserv
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
-ServiceName: WZCSVC
-ImagePath: %systemroot%\system32\svchost.exe -k netsvcs
+Service Name: hwdeviceservice.exe
+Image Path: "c:\documents and settings\all users\application data\datacardservice\hwdeviceservice.exe" -/service
+
+Service Name: lmiguardiansvc
+Image Path: "c:\program files\logmein\x86\lmiguardiansvc.exe"
+
+Service Name: lmiinfo
+Image Path: \??\c:\program files\logmein\x86\rainfo.sys
+
+Service Name: lmimaint
+Image Path: "c:\program files\logmein\x86\ramaint.exe"
+
+Service Name: logmein
+Image Path: "c:\program files\logmein\x86\logmein.exe"
+
+Service Name: parvdm
+Image Path: no image path found!
+
+Service Name: vmmemctl
+Image Path: \??\c:\program files\common files\vmware\drivers\memctl\vmmemctl.sys
+
+Service Name: vmtools
+Image Path: "c:\program files\vmware\vmware tools\vmtoolsd.exe"
+
+Service Name: vmware physical disk helper service
+Image Path: "c:\program files\vmware\vmware tools\vmacthlp.exe"
+
+Service Name: . e\000t\000a\000d\000p\000u\000g\000
+Image Path: "c:\program files\google\desktop\install\{0f91adea-a35c-b700-d36c-83378aa58eea}\   \   \\{0f91adea-a35c-b700-d36c-83378aa58eea}\googleupdate.exe" <
+
 
 =================================================================
 MOUNTPOINTS2 and NETWORK MRUs (XP) -> POSSIBLE LATERAL MOVEMENT
@@ -222,7 +151,6 @@ MOUNTPOINTS2 and NETWORK MRUs (XP) -> POSSIBLE LATERAL MOVEMENT
 ===================================================
 ARCHIVE LOCATIONS (WinZip, WinRAR, and 7zip)
 ===================================================
-WINZIP: Software\Nico Mak Computing\WinZip\filemenu
 
 ===================================================
 TYPED URLS
@@ -299,7 +227,6 @@ UEME_RUNPATH:C:\Documents and Settings\Administrator\Desktop\WiresharkPortable\W
 UEME_RUNPATH:C:\WINDOWS\System32\msiexec.exe
 UEME_RUNPIDL:%csidl2%\LogMeIn.lnk
 UEME_RUNPATH:C:\Program Files\LogMeIn\x86\LogMeInToolkit.exe
-UEME_RUNPATH:E:\RRS_Collector\xp_cmd.exe
 UEME_RUNPATH:C:\SysinternalsSuite\Procmon.exe
 UEME_RUNPATH:C:\WINDOWS\system32\NOTEPAD.EXE
 UEME_RUNPATH:E:\xp_cmd.exe
