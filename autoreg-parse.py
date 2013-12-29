@@ -6,10 +6,12 @@ Twitter: @patrickrolsen
 
 import time
 import hashlib
-import re
 import codecs
-from Registry import Registry
+import re
 import argparse
+from Registry import Registry
+from collections import defaultdict
+from itertools import izip
 
 parser = argparse.ArgumentParser(description='Parse the Windows registry for malware-ish related artifacts.')
 parser.add_argument('-nt', '--ntuser', help='Path to the NTUSER.DAT hive you want parsed')
@@ -22,21 +24,27 @@ if args.ntuser:
     reg_nt = Registry.Registry(args.ntuser)
 else:
     pass
-
 if args.software:
     reg_soft = Registry.Registry(args.software)
 else:
     pass
-
 if args.system:
     reg_sys = Registry.Registry(args.system)
 else:
     pass
 
+def getConotrolSet(reg_sys):
+    try:
+        select = reg_sys.open("Select")
+        current = select.value("Current").value()
+        controlsetnum = "ControlSet00%d" % (current)
+    
+        return controlsetnum
+
+    except Registry.RegistryKeyNotFoundException as e:
+        pass
 
 def getSysInfo(reg_soft, reg_sys):
-    '''This produces System Information to include product name, edition, current build and install date.'''
-
     os_dict = {}
 
     k = reg_soft.open("Microsoft\\Windows NT\\CurrentVersion")
@@ -60,9 +68,8 @@ def getSysInfo(reg_soft, reg_sys):
         pass
 
 
-    select = reg_sys.open("Select")
-    current = select.value("Current").value()
-    computerName = reg_sys.open("ControlSet00%d\\Control\\ComputerName\\ComputerName" % (current))
+    current = getConotrolSet(reg_sys)
+    computerName = reg_sys.open("%s\\Control\\ComputerName\\ComputerName" % (current))
 
     try:
         for v in computerName.values():
@@ -78,133 +85,7 @@ def getSysInfo(reg_soft, reg_sys):
     print "Computer Name: " + os_dict['ComputerName']
     print "Operating System: " + os_dict['ProductName'], os_dict['CurrentVersion'], os_dict['CurrentBuild']
     print "Install Date: " + os_dict['InstallDate']
-
-def getServices(reg_sys):
-    
-    select = reg_sys.open("Select")
-    current = select.value("Current").value()
-    services = reg_sys.open("ControlSet00%d\\Services" % (current))
-
-    service_list = []
-
-    for service in services.subkeys():
-        service_list.append(service.name().lower())
-
-    bootstart_list = []
-    kernelDriver_list = []
-    autostart_list = []
-    loadonDemand_list = []
-    disabled_list = []
-    '''
-    Reference: http://support.microsoft.com/kb/103000
-    Boot Loader scans the Registry for drivers with a Start value of 0 (which indicates that these drivers
-    should be loaded but not initialized before the Kernel) and a Type value of 0x1 (which indicates a Kernel
-    device driver such as a hard disk or other low-level hardware device driver).
-    Reference: Plaso Code Base
-    '''  
-    for service_name in service_list:
-        k = reg_sys.open("ControlSet00%d\\Services\\%s" % (current, service_name))
-        for v in k.values():
-            if v.name() == "Start":
-                start_methods = v.value()
-                for service_start_code in str(start_methods):
-                    # 0x0 (Boot) = Kernel Loader - Loaded by the boot loader.
-                    if service_start_code == "0":
-                        service_boot = k.name()
-                        bootstart_list.append(service_boot)
-                    # 0x1 (System) = I/O Subsystem - Driver to be loaded at Kernel initialization
-                    elif service_start_code == "1":
-                        service_kernelDriver = k.name()
-                        kernelDriver_list.append(service_kernelDriver)
-                    # 0x2 (Auto Load) = SCM - Loaded or started automatically for all start ups.
-                    elif service_start_code == "2":
-                        service_auto = k.name()
-                        autostart_list.append(service_auto)
-                    # 0x3 (Load on demand) = SCM - Not start until the user starts it.
-                    elif service_start_code == "3":
-                        service_loadonDemand = k.name()
-                        loadonDemand_list.append(service_loadonDemand)
-                    # 0x4 (Disabled) = SCM - Not to be started under any conditions.
-                    else:
-                        service_start_code == "4"
-                        service_disabled = k.name()
-                        disabled_list.append(service_disabled)
-
-    kernelDeviceDriver_list = []
-    fileSystemDriver_list   = []
-    adapter_list            = []
-    ownProcess_list         = []
-    shareProcess_list       = []
-
-    for service_name in service_list:
-        k = reg_sys.open("ControlSet00%d\\Services\\%s" % (current, service_name))
-        for v in k.values():
-            if v.name() == "Type":
-                service_type = v.value()
-                    # 1:  Kernel Device Driver (0x1)
-                if service_type == 1:
-                    type_KDD = k.name()
-                    kernelDeviceDriver_list.append(type_KDD)
-                    # 2:  File System Driver (0x2)
-                elif service_type == 2:
-                    type_fileSystemDriver = k.name()
-                    fileSystemDriver_list.append(type_fileSystemDriver)
-                    # 4:  Adapter (0x4)
-                elif service_type == 4:
-                    type_Adapter = k.name()
-                    adapter_list.append(type_Adapter)
-                    # 16: Service - Own Process (0x10)
-                elif service_type == 16:
-                    type_ownProcess = k.name()
-                    ownProcess_list.append(type_ownProcess)
-                else:
-                    # 32: Service - Share Process (0x20)
-                    service_type == 32
-                    type_ShareProcess = k.name()
-                    shareProcess_list.append(type_ShareProcess)
-
-    print ("\n" + ("=" * 51) + "\nSERVICE IMAGE PATHS NOT IN SYSTEM32 (Type 2)\n" + ("=" * 51))
-
-    for name in autostart_list:
-        k = reg_sys.open("ControlSet00%d\\Services\\%s" % (current, name))
-
-        try:
-            image_path = k.value("ImagePath").value().lower()
-
-            if "system32" not in image_path.lower():
-                print '[ALERT!!] \nServiceName: %s\nImagePath: %s\n' % (k.name().encode('ascii', 'ignore'), image_path.encode('ascii', 'ignore'))
-
-        except:
-            pass
-
-    print ("\n" + ("=" * 51) + "\nSERVICE IMAGE PATHS NOT IN SYSTEM32 (Type 0)\n" + ("=" * 51))
-
-    for name in bootstart_list:
-        k = reg_sys.open("ControlSet00%d\\Services\\%s" % (current, name))
-
-        try:
-            image_path = k.value("ImagePath").value().lower()
-
-            if "system32" not in image_path.lower():
-                print '[ALERT]\nServiceName: %s\nImagePath: %s\n' % (k.name().encode('ascii', 'ignore'), image_path.encode('ascii', 'ignore'))
-
-        except:
-            pass
-
-    # Printing all of the autostart services.
-    # By that I'm talking about services with type 2 start codes.
-    print ("\n" + ("=" * 51) + "\nLIST OF ALL AUTOSTART SERVICES\n" + ("=" * 51))
-
-    for name in autostart_list:
-        k = reg_sys.open("ControlSet00%d\\Services\\%s" % (current, name))
-
-        try:
-            image_path = k.value("ImagePath").value().lower()
-            print 'ServiceName: %s\nImagePath: %s\n' % (k.name().encode('ascii', 'ignore'), image_path.encode('ascii', 'ignore'))
-
-        except:
-            pass
-
+       
 def getRunKeys(reg_soft, reg_nt, reg_sys):
 
     print ("\n" + ("=" * 51) + "\nTRADITIONAL \"RUN\" KEYS\n" + ("=" * 51))
@@ -310,15 +191,80 @@ def getWinlogon(reg_soft):
     except Registry.RegistryKeyNotFoundException as e:
         pass
 
+def getServices(reg_sys):
+    current = getConotrolSet(reg_sys)       
+    services = reg_sys.open('%s\\Services' % (current))
+
+    service_list = []
+    autostart_list = []
+    autostart_dict = defaultdict(list)
+    loadondemand_dict = defaultdict(list)
+    
+    service_baseline = []
+    baseline = open("services.txt", 'r').read()
+    service_baseline.append(baseline.rstrip('\n').lower())    
+
+    for service in services.subkeys():
+        service_list.append(service.name().lower())
+
+    for service_name in service_list:
+        k = reg_sys.open('%s\\Services\\%s' % (current, service_name))
+    
+        for v in k.values():
+            if v.name() == "Start":
+                start_methods = v.value()
+                for service_start_code in str(start_methods):
+                    # 0x2 (Auto Load) = SCM - Loaded or started automatically for all start ups.
+                    if service_start_code == "2": 
+                        autostart_list.append(k.name())
+                        try:
+                            image_path = k.value("ImagePath").value()
+                        except:
+                            image_path = "No Image Path Found!"
+                        autostart_dict['ServiceName'].append(k.name().lower())
+                        autostart_dict['ImagePath'].append(image_path.lower())
+                    # 0x3 (Load on demand) = SCM - Not start until the user starts it.
+                    elif service_start_code == "3": 
+                        autostart_list.append(k.name())
+                        try:
+                            image_path = k.value("ImagePath").value()
+                        except:
+                            image_path = "No Image Path Found!"
+                        
+                        loadondemand_dict['ServiceName'].append(k.name().lower())
+                        loadondemand_dict['ImagePath'].append(image_path.lower())
+                        pass
+                    
+            else:
+                pass
+    
+    # This doesn't take into account the Image Path as whitelisted. It's only checking the service names.
+    print ("\n" + ("=" * 51) + "\nUNKNOWN/NON-BASELINED TYPE 2 SERVICES)\n" + ("=" * 51))
+    
+    for sname, ipath  in izip(autostart_dict['ServiceName'], autostart_dict['ImagePath']):
+        for name in service_baseline: #This is a list from above.
+            if sname.lower() in name.lower():
+                pass
+            else:
+                print 'Service Name: %s\nImage Path: %s\n' % (sname, ipath.encode('ascii', 'ignore'))
+      
+    print ("\n" + ("=" * 51) + "\nTYPE 2 SERVICES NOT IN SYSTEM32\n" + ("=" * 51))
+    
+    for sname, ipath  in izip(autostart_dict['ServiceName'], autostart_dict['ImagePath']):
+            #print "Service Name: %s\nImage Path: %s\n" % (sname, ipath.encode('ascii', 'ignore'))
+        if "system32" not in ipath.lower():
+            print "Service Name: %s\nImage Path: %s\n" % (sname, ipath.encode('ascii', 'ignore'))
+        else:
+            pass
 def getSessionManager(reg_sys):
 
     print ("\n" + ("=" * 51) + "\nSESSION MANAGER INFORMATION\n" + ("=" * 51))
 
-    selectCurrent = reg_sys.open("Select")
-    selectCurrentNumber = selectCurrent.value("Current").value()
-    controlSetSubkeys = reg_sys.open('ControlSet00%d\\Control' % (selectCurrentNumber))
+    current = getConotrolSet(reg_sys)       
+    
+    controlSetSubkeys = reg_sys.open('%s\\Control' % (current))
 
-    session_manager_list = [('ControlSet00%d\\' % (selectCurrentNumber)) + controlSetSubkeys.name() + "\\Session Manager"]
+    session_manager_list = [('%s\\' % (current)) + controlSetSubkeys.name() + "\\Session Manager"]
 
     try:
         for k in session_manager_list:
